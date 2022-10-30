@@ -1,3 +1,4 @@
+using System;
 using Puppet.Http.Commands;
 using Puppet.Http.Utils;
 
@@ -34,6 +35,14 @@ namespace Puppet.Http
                    break;
                case StopCommand:
                    _worker.Stop().ConfigureAwait(false);
+                   break;
+               case InfoCommand:
+                   var info = _worker.CollectInfo();
+                   foreach (var i in info) Console.WriteLine(i);
+                   break;
+               case LogCommand:
+               case Commands.SetCommand:
+                   _worker.SetCommand(command);
                    break;
             }
         }

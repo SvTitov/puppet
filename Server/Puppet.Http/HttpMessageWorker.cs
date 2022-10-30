@@ -1,44 +1,91 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text.Json;
 using System.IO;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
+using Puppet.Http.Commands;
 using Puppet.Http.Utils;
 
 namespace Puppet.Http
 {
     public class HttpMessageWorker
     {
-        private HttpListener _listener;
-        private bool _isWorking = true;
-        private ThreadSafeBoolToken _token = new ();
+        #region Fields
         
-        public async Task Run(int port)
-        {
-            _listener = new HttpListener();
-            _listener.Prefixes.Add($"http://localhost:{port}/");
-            _listener.Start();
-            _token.ChangeValue(true);
-            
-            Debug.WriteLine("--- Server was started!");
-            
-            await Task.Run(ProcessHttp);
-        }
+        private HttpListener _listener;
+        private ThreadSafeBoolToken _token = new ();
+        private readonly CommandProvider _commandProvider = new ();
+        private int _port;
 
+        private const string BaseUri = "localhost";
+        
+        #endregion
+
+        #region Properties
+        
+        public bool IsRunning => _token.Value;
+
+        #endregion
+
+        #region Public
+        
         public Task Stop()
         {
             _listener.Stop();
+            _listener = null;
             _token.ChangeValue(false);
             
             return Task.CompletedTask;
         }
 
-
-        public void SetCommand(string command, string[] args)
+        public async Task Run(int port)
         {
+            _port = port;
             
+            _listener = new HttpListener();
+
+            var address = new UriBuilder("http", BaseUri, _port).Uri.AbsoluteUri;
+
+            _listener.Prefixes.Add(address);
+            _listener.Start();
+
+            _token.ChangeValue(_listener.IsListening);
+
+            if (_listener.IsListening)
+            {
+                await Task.Run(ProcessHttp);
+                Log("--- Http handler was stared");
+            }
+            else
+            {
+                Log("--- Http handler was not started due to inner issue");
+            } 
         }
+        
+        public void SetCommand(ICommand command)
+        {
+            switch (command)
+            {
+               case LogCommand logCommand:
+                   Log($"--- Message: {logCommand.Message}");
+                   break;
+               case Commands.SetCommand:
+                   _commandProvider?.SetCommand(command);
+                   break;
+            } 
+        }
+        
+        public IEnumerable<string> CollectInfo()
+        {
+            yield return $"Message handler is working: {IsRunning}";
+            yield return $"Message handler is running on {_port} port";
+        }
+        
+        #endregion
+
+        #region Private
 
         private async Task ProcessHttp()
         {
@@ -52,21 +99,36 @@ namespace Puppet.Http
             }
         }
 
-        private Task HandleResponse(HttpListenerResponse contextResponse)
+        private async Task HandleResponse(HttpListenerResponse contextResponse)
         {
+            var command = await _commandProvider?.GetCommand()!;
+
+            var content = JsonSerializer.Serialize(command);
+
+            contextResponse.ContentType = "application/json";
+
+            var sr = new StreamWriter(contextResponse.ContentType);
+            await sr.WriteAsync(content);
+            
             contextResponse.StatusCode = 200;
             contextResponse.Close();
-            
-            return Task.CompletedTask;
         }
-
+        
         private async Task HandleRequest(HttpListenerRequest contextRequest)
         {
             var sr = new StreamReader(contextRequest.InputStream);
             
             var content = await sr.ReadToEndAsync();
 
-            Debug.WriteLine($"--- Content: {content}");
+            Log($"--- Content: {content}");
         }
+
+
+        private void Log(string message)
+        {
+            Console.WriteLine(message);    
+        }
+        
+        #endregion
     }
 }
