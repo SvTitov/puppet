@@ -7,12 +7,10 @@ namespace Puppet.Console
     {
         static void Main(string[] args)
         {
-            var worker = new WorkerManager();
-            
             while (true)
             {
                 var inputLine = System.Console.ReadLine()?.Split(' ');
-                worker.SetCommand(inputLine);
+                WorkerManager.Instance.SetCommand(inputLine);
             }
         }
     }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text.Json;
 using System.IO;
 using System.Net;
@@ -17,7 +16,7 @@ namespace Puppet.Http
         private HttpListener _listener;
         private ThreadSafeBoolToken _token = new ();
         private readonly CommandProvider _commandProvider = new ();
-        private int _port;
+        private int _port = 5432;
 
         private const string BaseUri = "localhost";
         
@@ -33,37 +32,58 @@ namespace Puppet.Http
         
         public Task Stop()
         {
-            _listener.Stop();
+            _listener?.Stop();
             _listener = null;
             _token.ChangeValue(false);
-            
+           
+            Log("--- Http handler was stopped");
             return Task.CompletedTask;
         }
 
-        public async Task Run(int port)
+        public async Task Restart()
+        {
+            Log("--- Restarting Http handler");
+            
+            await Stop();
+            Run(_port);
+        }
+
+        public void Run(int port)
         {
             _port = port;
             
-            _listener = new HttpListener();
+            var wasStarted = RunHttpListener(port);
 
-            var address = new UriBuilder("http", BaseUri, _port).Uri.AbsoluteUri;
+            _token.ChangeValue(wasStarted);
 
-            _listener.Prefixes.Add(address);
-            _listener.Start();
-
-            _token.ChangeValue(_listener.IsListening);
-
-            if (_listener.IsListening)
+            if (wasStarted)
             {
-                await Task.Run(ProcessHttp);
                 Log("--- Http handler was stared");
+                Task.Run(ProcessHttp).ConfigureAwait(false);
             }
             else
             {
                 Log("--- Http handler was not started due to inner issue");
             } 
         }
-        
+
+        private bool RunHttpListener(int port)
+        {
+            _listener = new HttpListener();
+
+            var address = BuildUri(port);
+
+            _listener.Prefixes.Add(address);
+            _listener.Start();
+
+            return _listener.IsListening;
+        }
+
+        private string BuildUri(int port)
+        {
+            return new UriBuilder("http", BaseUri, port).Uri.AbsoluteUri;
+        }
+
         public void SetCommand(ICommand command)
         {
             switch (command)
@@ -95,20 +115,21 @@ namespace Puppet.Http
 
                 await HandleRequest(context.Request);
 
-                await HandleResponse(context.Response);
+                var commandFromConsole = await _commandProvider?.GetCommand()!;
+                
+                await HandleResponse(context.Response, commandFromConsole);
             }
         }
 
-        private async Task HandleResponse(HttpListenerResponse contextResponse)
+        private async Task HandleResponse(HttpListenerResponse contextResponse, ICommand command)
         {
-            var command = await _commandProvider?.GetCommand()!;
-
-            var content = JsonSerializer.Serialize(command);
+            var content = JsonSerializer.Serialize(command, command.GetType(), new JsonSerializerOptions { WriteIndented = true });
 
             contextResponse.ContentType = "application/json";
 
-            var sr = new StreamWriter(contextResponse.ContentType);
+            var sr = new StreamWriter(contextResponse.OutputStream);
             await sr.WriteAsync(content);
+            sr.Close();
             
             contextResponse.StatusCode = 200;
             contextResponse.Close();

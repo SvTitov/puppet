@@ -6,12 +6,29 @@ namespace Puppet.Http
 {
     public class WorkerManager
     {
+        #region Singleton
+
         private static WorkerManager _instance;
         public static WorkerManager Instance => _instance ??= new WorkerManager();
+
+        #endregion
+
+        #region Fields
 
         private readonly CommandValidator _commandValidator = new();
         private readonly CommandParser _commandParser = new();
         private readonly HttpMessageWorker _worker = new ();
+
+        #endregion
+
+        #region Private Ctor
+
+        private WorkerManager()
+        {}
+        
+        #endregion
+
+        #region Public
         
         public void SetCommand(string[] args)
         {
@@ -26,12 +43,16 @@ namespace Puppet.Http
             }
         }
 
+        #endregion
+
+        #region Private
+        
         private void ProcessCommand(ICommand command)
         {
             switch (command)
             {
                case StartCommand startCommand:
-                   _worker.Run(startCommand.Port).ConfigureAwait(false);
+                   _worker.Run(startCommand.Port);
                    break;
                case StopCommand:
                    _worker.Stop().ConfigureAwait(false);
@@ -40,11 +61,16 @@ namespace Puppet.Http
                    var info = _worker.CollectInfo();
                    foreach (var i in info) Console.WriteLine(i);
                    break;
+               case RestartCommand:
+                   _worker?.Restart();
+                   break;
                case LogCommand:
                case Commands.SetCommand:
                    _worker.SetCommand(command);
                    break;
             }
         }
+
+        #endregion
     }
 }

@@ -29,6 +29,11 @@ namespace Puppet.Http.Utils
                 return new InfoCommand();
             }
 
+            if (command == "restart")
+            {
+                return new RestartCommand();
+            }
+
             return null;
         }
 
