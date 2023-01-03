@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.IO;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Puppet.Http.Commands;
 using Puppet.Http.Utils;
@@ -123,16 +124,22 @@ namespace Puppet.Http
 
         private async Task HandleResponse(HttpListenerResponse contextResponse, ICommand command)
         {
-            var content = JsonSerializer.Serialize(command, command.GetType(), new JsonSerializerOptions { WriteIndented = true });
+            using (contextResponse)
+            {
+                var content = JsonSerializer.Serialize(command, command.GetType(), new JsonSerializerOptions { WriteIndented = true });
 
-            contextResponse.ContentType = "application/json";
+                contextResponse.ContentType = "application/json";
 
-            var sr = new StreamWriter(contextResponse.OutputStream);
-            await sr.WriteAsync(content);
-            sr.Close();
-            
-            contextResponse.StatusCode = 200;
-            contextResponse.Close();
+                var buffer = Encoding.UTF8.GetBytes(content);
+                contextResponse.ContentLength64 = buffer.Length;
+
+                await using (var str = contextResponse.OutputStream)
+                {
+                    await str.WriteAsync(buffer, 0, buffer.Length);
+                }
+                
+                // contextResponse.StatusCode = 200;
+            }
         }
         
         private async Task HandleRequest(HttpListenerRequest contextRequest)

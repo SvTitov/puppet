@@ -6,5 +6,4 @@ HttpClient client = new HttpClient();
 
 
 var f = new FooClass();
-var r = await f.PUPPET_ESTABLISH_CONNECTION().ConfigureAwait(false);
-Console.WriteLine(r);
+await f.PUPPET_ESTABLISH_CONNECTION().ConfigureAwait(false);

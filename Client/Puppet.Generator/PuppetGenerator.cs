@@ -46,8 +46,9 @@ public class PuppetGenerator : ISourceGenerator
             SourceText sourceText = SourceText.From($@"
 public partial class {classDeclarationSyntax.Identifier}
 {{
-
     {HttpClientSources.CONNECT_METHOD}
+
+    {HttpClientSources.ON_CONNECTION_RESULT_METHOD}
 }}", Encoding.UTF8);
             context.AddSource($"{classDeclarationSyntax.Identifier}.g.cs", sourceText);
         }

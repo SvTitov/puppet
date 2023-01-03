@@ -6,7 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{D5FF5F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puppet.Http", "Server\Puppet.Http\Puppet.Http.csproj", "{EF32A5D4-8C05-4673-9721-F2D52371D0D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puppet.Console", "Server\Puppet.Console\Puppet.Console.csproj", "{3A003722-92A6-4CD3-BB05-24E7E73F1F02}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puppet.Server.Console", "Server\Puppet.Server.Console\Puppet.Server.Console.csproj", "{3A003722-92A6-4CD3-BB05-24E7E73F1F02}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{25DAC367-BC60-4794-9492-C6176ABAD390}"
 EndProject
@@ -16,7 +16,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puppet.Core", "Client\Puppe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puppet.Generator", "Client\Puppet.Generator\Puppet.Generator.csproj", "{D08B8DB0-CE7F-48DF-B017-168EC779E88E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puppet.ConsoleSample", "Client\Puppet.ConsoleSample\Puppet.ConsoleSample.csproj", "{A52171AD-186E-484C-802C-537B259314F0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puppet.Client.Console", "Client\Puppet.Client.Console\Puppet.Client.Console.csproj", "{A52171AD-186E-484C-802C-537B259314F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

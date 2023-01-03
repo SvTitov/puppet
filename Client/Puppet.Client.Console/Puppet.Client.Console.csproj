@@ -5,6 +5,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <RootNamespace>Puppet.ConsoleSample</RootNamespace>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -12,6 +13,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Puppet.Core\Puppet.Core.csproj" />
         <ProjectReference Include="..\Puppet.Generator\Puppet.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup> 
     

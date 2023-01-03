@@ -24,7 +24,9 @@ namespace Puppet.Http.Utils
         {
             if (_command != null)
             {
-                return _command;
+                var temp = _command;
+                _command = null;
+                return temp;
             }
 
             return await _completionSource.Task;

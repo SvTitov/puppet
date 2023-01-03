@@ -8,25 +8,28 @@ public class HttpClientSources
 
 ";
     
+    // TODO: move All classes from Core -> generator
     
+    //TODO: Create specific libs for xamarin.forms and maui
     
     public const string CONNECT_METHOD = @"
 
-    public virtual async System.Threading.Tasks.Task<string> PUPPET_ESTABLISH_CONNECTION()
+    public virtual async System.Threading.Tasks.Task PUPPET_ESTABLISH_CONNECTION()
     {{
-        int port = 5432;
+        var progress = new System.Progress<string>(OnConnectionResult);
 
-        var client = new System.Net.Http.HttpClient();
-        client.BaseAddress = new UriBuilder(""http"", ""localhost"", port).Uri;
-        client.Timeout = System.Threading.Timeout.InfiniteTimeSpan;
+        var processor = new Puppet.Core.ConnectionProcessor();
 
-        //while(IsWorking)
-        //{
-        //}
-
-        var result = await client.GetAsync("""");
-        return await result.Content.ReadAsStringAsync(); 
+        await processor.Run(progress); 
     }}
-
 ";
+
+    public const string ON_CONNECTION_RESULT_METHOD = @"
+
+    public virtual void OnConnectionResult(string res)
+    {{
+       Console.WriteLine(res);
+    }}
+";
+
 }
