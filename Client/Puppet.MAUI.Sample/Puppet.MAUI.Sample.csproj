@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net7.0-android;net7.0-ios</TargetFrameworks>
+        <OutputType>Exe</OutputType>
+        <RootNamespace>Puppet.MAUI.Sample</RootNamespace>
+        <UseMaui>true</UseMaui>
+        <SingleProject>true</SingleProject>
+        <ImplicitUsings>enable</ImplicitUsings>
+
+        <!-- Display name -->
+        <ApplicationTitle>Puppet.MAUI.Sample</ApplicationTitle>
+
+        <!-- App Identifier -->
+        <ApplicationId>com.companyname.puppet.maui.sample</ApplicationId>
+        <ApplicationIdGuid>11AFDB7A-3BD5-4520-B126-D4C8CE70F25D</ApplicationIdGuid>
+
+        <!-- Versions -->
+        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+        <ApplicationVersion>1</ApplicationVersion>
+
+        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
+        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- App Icon -->
+        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+
+        <!-- Splash Screen -->
+        <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+
+        <!-- Images -->
+        <MauiImage Include="Resources\Images\*" />
+        <MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
+
+        <!-- Custom Fonts -->
+        <MauiFont Include="Resources\Fonts\*" />
+
+        <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
+        <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0-rc.1.22426.10" />
+    </ItemGroup>
+
+    <ItemGroup>
+<!--        <ProjectReference Include="..\Puppet.Generator\Puppet.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />-->
+        <ProjectReference Include="..\Puppet.MAUI\Puppet.MAUI.csproj" />
+    </ItemGroup>
+
+</Project>
