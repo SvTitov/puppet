@@ -1,22 +1,14 @@
 using System.Collections.Immutable;
 using Puppet.Shared.Commands;
+using Puppet.Shared.Commands.SetCommand;
 
 namespace Puppet.Shared;
 
 public class CommandMapper
 {
-    
-    public ICommand? Map(string[] input)
+    public ICommand? Map(string[] input) => input.ElementAtOrDefault(0) switch
     {
-        var name = input.ElementAtOrDefault(0);
-
-        switch (name)
-        {
-            case SetCommand.CommandName:
-                SetCommand.FromStrings(input.Skip(1));
-                break;
-        }
-
-        return null;
-    }
+        "set" => SetCommand.FromStrings(input.Skip(1)),
+        _ => null
+    };
 }
