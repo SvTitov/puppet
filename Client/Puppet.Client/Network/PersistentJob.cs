@@ -4,16 +4,15 @@ namespace Puppet.Client.Network;
 
 internal class PersistentJob<T>
 {
+    private bool _isRunning;
+    
     public static PersistentJob<T> Configure(Func<CancellationToken, Task<T>> job)
     {
         return new PersistentJob<T>(job);
     }
 
-    
     private readonly Func<CancellationToken, Task<T>> _taskJob;
 
-    private bool _isRunning;
-    
     private PersistentJob(Func<CancellationToken, Task<T>> job)
     {
         _taskJob = job;

@@ -9,6 +9,16 @@ public class PuppetLauncher
     
     public Task Launch()
     {
-        return Task.CompletedTask;
+        return _networkClient.Run(new Progress<string>(Handler));
+    }
+
+    public Task Stop()
+    {
+        return _networkClient.Stop();
+    }
+
+    private void Handler(string obj)
+    {
+        Console.WriteLine($"Received: {obj}");
     }
 }

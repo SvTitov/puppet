@@ -1,4 +1,5 @@
 using Microsoft.Maui.LifecycleEvents;
+using Puppet.Client;
 using Puppet.Client.Network;
 
 namespace Puppet.MAUI;
@@ -11,18 +12,20 @@ public static class BuilderExtension
         {
 #if ANDROID
             //TODO: add implementation of Puppet with events
+            var launcher = new PuppetLauncher();
             events.AddAndroid(android =>
             {
-                android.OnResume(activity => Console.WriteLine("--- Native OnResume"));
-                android.OnPause(activity => Console.WriteLine("--- Native OnPause"));
+                android.OnResume(_ => launcher.Launch());
+                android.OnPause(_ => launcher.Stop());
             });
 #endif
 
 #if IOS
+            var launcher = new PuppetLauncher();
             events.AddiOS(ios =>
             {
-                ios.OnActivated(x => Console.WriteLine("--- OnActivated"));
-                ios.OnResignActivation(x => Console.WriteLine("--- OnResignActivation"));
+                ios.OnActivated(_ => launcher.Launch());
+                ios.OnResignActivation(_ => launcher.Stop());
             });
 #endif
         });
